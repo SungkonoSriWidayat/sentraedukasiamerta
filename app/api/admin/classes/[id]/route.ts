@@ -14,8 +14,8 @@ async function verifyAdminToken(request: NextRequest) {
   if (decoded.role !== 'admin') throw new Error('Akses ditolak: Bukan admin');
 }
 
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
-  try {
+export async function GET(request: NextRequest, { params }: { params: { id: string } }){
+    try {
     await verifyAdminToken(request);
     await dbConnect();
 
@@ -30,7 +30,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
 }
 
 export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
-  try {
+    try {
     await verifyAdminToken(request);
     await dbConnect();
 
@@ -49,7 +49,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 }
 
 export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
-  try {
+    try {
     await verifyAdminToken(request);
     await dbConnect();
 
