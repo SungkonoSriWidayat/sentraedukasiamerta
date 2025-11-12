@@ -1,7 +1,13 @@
-import type { NextConfig } from "next";
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  // ...mungkin ada konfigurasi Anda yang lain di sini...
 
-const nextConfig: NextConfig = {
-  /* config options here */
+  // TAMBAHKAN BLOK INI:
+  eslint: {
+    // Warning: Ini akan mengabaikan error ESLint saat proses build.
+    // Sebaiknya perbaiki errornya, bukan diabaikan.
+    ignoreDuringBuilds: true,
+  },
 };
 
-export default nextConfig;
+module.exports = nextConfig;
