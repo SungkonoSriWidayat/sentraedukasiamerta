@@ -1,4 +1,6 @@
 // app/api/admin/classes/[id]/route.ts
+// Tes redeploy 123
+// (Kode Anda yang lain di bawahnya...)
 import { NextResponse, NextRequest } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import Class from '@/models/Class';
