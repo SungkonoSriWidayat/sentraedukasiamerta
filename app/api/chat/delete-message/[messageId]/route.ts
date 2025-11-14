@@ -5,7 +5,10 @@ import jwt, { JwtPayload } from 'jsonwebtoken';
 
 const secret = process.env.NEXTAUTH_SECRET;
 
-export async function DELETE(req: NextRequest, { params }: { params: { messageId: string } }) {
+export async function DELETE(
+  req: NextRequest, 
+  { params }: { params: Promise<{ messageId: string }> } // PERBAIKAN: params sebagai Promise
+) {
     const authHeader = req.headers.get('Authorization');
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
         return NextResponse.json({ success: false, message: 'Token tidak ditemukan.' }, { status: 401 });
@@ -17,7 +20,9 @@ export async function DELETE(req: NextRequest, { params }: { params: { messageId
         const userId = decoded.id;
 
         await dbConnect();
-        const { messageId } = params;
+        
+        // PERBAIKAN: Tunggu params dengan await
+        const { messageId } = await params;
 
         const message = await Message.findById(messageId);
 

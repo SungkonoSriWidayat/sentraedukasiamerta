@@ -11,7 +11,10 @@ interface DecodedToken {
   role: string;
 }
 
-export async function DELETE(request: Request, { params }: { params: { proposalId: string } }) {
+export async function DELETE(
+  request: Request, 
+  { params }: { params: Promise<{ proposalId: string }> } // PERBAIKAN: params sebagai Promise
+) {
   try {
     // 1. Verifikasi bahwa yang mengakses adalah tutor
     const token = request.headers.get('authorization')?.split(' ')[1];
@@ -20,7 +23,9 @@ export async function DELETE(request: Request, { params }: { params: { proposalI
     if (decoded.role !== 'tutor') throw new Error('Akses ditolak');
 
     await dbConnect();
-    const { proposalId } = params;
+    
+    // PERBAIKAN: Tunggu params dengan await
+    const { proposalId } = await params;
 
     const proposal = await ClassProposal.findById(proposalId);
 

@@ -13,7 +13,7 @@ interface DecodedToken extends JwtPayload {
 
 export async function GET(
     req: NextRequest,
-    { params }: { params: { classId: string; userId: string } } 
+    { params }: { params: Promise<{ classId: string; userId: string }> } // PERBAIKAN: params sebagai Promise
 ) {
     const token = req.headers.get('Authorization')?.split(' ')[1];
     if (!token) {
@@ -23,7 +23,9 @@ export async function GET(
     try {
         const decoded = verify(token, secret!) as DecodedToken;
         const currentUserId = decoded.id;
-        const { classId, userId: otherUserId } = params;
+        
+        // PERBAIKAN: Tunggu params dengan await
+        const { classId, userId: otherUserId } = await params;
 
         if (!mongoose.Types.ObjectId.isValid(classId) || !mongoose.Types.ObjectId.isValid(otherUserId)) {
             return NextResponse.json({ success: false, message: 'ID Kelas atau Pengguna tidak valid.' }, { status: 400 });

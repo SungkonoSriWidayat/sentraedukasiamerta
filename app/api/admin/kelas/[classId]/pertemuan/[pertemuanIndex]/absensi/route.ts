@@ -7,7 +7,10 @@ import jwt, { JwtPayload } from 'jsonwebtoken';
 
 const secret = process.env.NEXTAUTH_SECRET;
 
-export async function GET(req: NextRequest, { params }: { params: { classId: string, pertemuanIndex: string } }) {
+export async function GET(
+  req: NextRequest, 
+  { params }: { params: Promise<{ classId: string; pertemuanIndex: string }> }
+) {
   const authHeader = req.headers.get('Authorization');
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return NextResponse.json({ success: false, message: 'Token tidak ditemukan.' }, { status: 401 });
@@ -22,7 +25,8 @@ export async function GET(req: NextRequest, { params }: { params: { classId: str
 
     await dbConnect();
     
-    const { classId, pertemuanIndex } = params;
+    // PERBAIKAN: Tunggu params dengan await
+    const { classId, pertemuanIndex } = await params;
     const index = parseInt(pertemuanIndex, 10); // Ini adalah 'pertemuan' (misal: 0, 1, 2)
 
     // 1. Ambil data kelas dan siswa terdaftar
@@ -74,4 +78,3 @@ export async function GET(req: NextRequest, { params }: { params: { classId: str
     return NextResponse.json({ success: false, message: 'Terjadi kesalahan server.' }, { status: 500 });
   }
 }
-

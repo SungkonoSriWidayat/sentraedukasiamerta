@@ -18,10 +18,15 @@ interface IQuestionFromDB {
 }
 
 // Fungsi ini mengambil detail tes lengkap dengan struktur sesinya
-export async function GET(request: Request, { params }: { params: { testId: string } }) {
+export async function GET(
+    request: Request, 
+    { params }: { params: Promise<{ testId: string }> } // PERBAIKAN: params sebagai Promise
+) {
     try {
         await dbConnect();
-        const { testId } = params;
+        
+        // PERBAIKAN: Tunggu params dengan await
+        const { testId } = await params;
 
         const authHeader = request.headers.get('Authorization');
         if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -72,4 +77,3 @@ export async function GET(request: Request, { params }: { params: { testId: stri
         return NextResponse.json({ success: false, message: 'Terjadi kesalahan pada server' }, { status: 500 });
     }
 }
-

@@ -10,9 +10,13 @@ interface TokenPayload extends JwtPayload {
 }
 
 // Fungsi untuk GET (mengambil satu tes spesifik) - Berguna untuk halaman edit
-export async function GET(req: NextRequest, { params }: { params: { testId: string } }) {
+export async function GET(
+    req: NextRequest, 
+    { params }: { params: Promise<{ testId: string }> } // PERBAIKAN: params sebagai Promise
+) {
     try {
-        const { testId } = params;
+        // PERBAIKAN: Tunggu params dengan await
+        const { testId } = await params;
          // Autentikasi bisa ditambahkan di sini jika perlu
         
         if (!mongoose.Types.ObjectId.isValid(testId)) {
@@ -34,11 +38,10 @@ export async function GET(req: NextRequest, { params }: { params: { testId: stri
     }
 }
 
-
 // Fungsi untuk PUT (memperbarui tes)
 export async function PUT(
     req: NextRequest,
-    { params }: { params: { testId: string } }
+    { params }: { params: Promise<{ testId: string }> } // PERBAIKAN: params sebagai Promise
 ) {
     const token = req.headers.get('Authorization')?.split(' ')[1];
     if (!token) {
@@ -51,7 +54,8 @@ export async function PUT(
             return NextResponse.json({ success: false, message: 'Akses tidak sah' }, { status: 403 });
         }
 
-        const { testId } = params;
+        // PERBAIKAN: Tunggu params dengan await
+        const { testId } = await params;
         if (!mongoose.Types.ObjectId.isValid(testId)) {
             return NextResponse.json({ success: false, message: 'ID tes tidak valid' }, { status: 400 });
         }
@@ -86,4 +90,3 @@ export async function PUT(
         return NextResponse.json({ success: false, message: 'Terjadi kesalahan pada server' }, { status: 500 });
     }
 }
-

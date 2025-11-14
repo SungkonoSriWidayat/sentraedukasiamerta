@@ -12,7 +12,10 @@ const coreApi = new midtransClient.CoreApi({
   clientKey: process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY,
 });
 
-export async function POST(req: NextRequest, { params }: { params: { orderId: string } }) {
+export async function POST(
+  req: NextRequest, 
+  { params }: { params: Promise<{ orderId: string }> } // PERBAIKAN: params sebagai Promise
+) {
   try {
     await dbConnect();
 
@@ -22,7 +25,8 @@ export async function POST(req: NextRequest, { params }: { params: { orderId: st
       return NextResponse.json({ success: false, message: authResult.message }, { status: 401 });
     }
 
-    const { orderId } = params;
+    // PERBAIKAN: Tunggu params dengan await
+    const { orderId } = await params;
     const { userId } = authResult;
 
     // 2. Ambil Detail Order

@@ -6,20 +6,31 @@ import { verify } from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.NEXTAUTH_SECRET!;
 
+// === PERBAIKAN: params sekarang adalah Promise ===
+type RouteContext = {
+  params: Promise<{ id: string }>
+}
+
 async function verifyAdminToken(request: NextRequest) {
   const token = request.headers.get('authorization')?.split(' ')[1];
   if (!token) throw new Error('Akses ditolak: Token tidak ditemukan');
-
+  
   const decoded = verify(token, JWT_SECRET) as { role: string };
   if (decoded.role !== 'admin') throw new Error('Akses ditolak: Bukan admin');
 }
 
-export async function GET(request: NextRequest, { params }: { params: { id: string } }){
-    try {
+// ==========================================================
+// === FUNGSI GET (SUDAH DIPERBAIKI) ===
+// ==========================================================
+export async function GET(request: NextRequest, context: RouteContext) {
+  try {
     await verifyAdminToken(request);
     await dbConnect();
 
-    const classItem = await Class.findById(params.id);
+    // PERBAIKAN: Tunggu params dengan await
+    const { id } = await context.params;
+
+    const classItem = await Class.findById(id);
     if (!classItem) {
       return NextResponse.json({ success: false, error: 'Kelas tidak ditemukan' }, { status: 404 });
     }
@@ -29,18 +40,24 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
   }
 }
 
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
-    try {
+// ==========================================================
+// === FUNGSI PUT (SUDAH DIPERBAIKI) ===
+// ==========================================================
+export async function PUT(request: NextRequest, context: RouteContext) {
+  try {
     await verifyAdminToken(request);
     await dbConnect();
 
+    // PERBAIKAN: Tunggu params dengan await
+    const { id } = await context.params;
+
     const body = await request.json();
-    const updatedClass = await Class.findByIdAndUpdate(params.id, body, {
-        new: true,
-        runValidators: true,
+    const updatedClass = await Class.findByIdAndUpdate(id, body, {
+      new: true,
+      runValidators: true,
     });
     if (!updatedClass) {
-        return NextResponse.json({ success: false, error: 'Kelas tidak ditemukan' }, { status: 404 });
+      return NextResponse.json({ success: false, error: 'Kelas tidak ditemukan' }, { status: 404 });
     }
     return NextResponse.json({ success: true, data: updatedClass });
   } catch (error: any) {
@@ -48,14 +65,20 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
   }
 }
 
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
-    try {
+// ============================================================
+// === FUNGSI DELETE (SUDAH DIPERBAIKI) ===
+// ============================================================
+export async function DELETE(request: NextRequest, context: RouteContext) {
+  try {
     await verifyAdminToken(request);
     await dbConnect();
 
-    const deletedClass = await Class.findByIdAndDelete(params.id);
+    // PERBAIKAN: Tunggu params dengan await
+    const { id } = await context.params;
+
+    const deletedClass = await Class.findByIdAndDelete(id);
     if (!deletedClass) {
-        return NextResponse.json({ success: false, error: 'Kelas tidak ditemukan' }, { status: 404 });
+      return NextResponse.json({ success: false, error: 'Kelas tidak ditemukan' }, { status: 404 });
     }
     return NextResponse.json({ success: true, data: {} });
   } catch (error: any) {

@@ -12,14 +12,19 @@ interface DecodedToken {
   role: string;
 }
 
-export async function GET(request: Request, { params }: { params: { classId: string } }) {
+export async function GET(
+  request: Request, 
+  { params }: { params: Promise<{ classId: string }> } // PERBAIKAN: params sebagai Promise
+) {
   try {
     const token = request.headers.get('authorization')?.split(' ')[1];
     if (!token) throw new Error('Akses ditolak: Token tidak ditemukan');
     const decoded = verify(token, JWT_SECRET) as DecodedToken;
 
     await dbConnect();
-    const { classId } = params;
+    
+    // PERBAIKAN: Tunggu params dengan await
+    const { classId } = await params;
     
     // Pastikan classId adalah string yang valid untuk ObjectId
     if (!mongoose.Types.ObjectId.isValid(classId)) {

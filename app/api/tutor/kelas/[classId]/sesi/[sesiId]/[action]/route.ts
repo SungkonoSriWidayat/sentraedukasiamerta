@@ -14,7 +14,7 @@ interface DecodedToken extends JwtPayload {
 // Handler untuk PUT: Mengaktifkan atau menonaktifkan sesi
 export async function PUT(
     req: NextRequest,
-    { params }: { params: { classId: string; sesiId: string; action: string } }
+    { params }: { params: Promise<{ classId: string; sesiId: string; action: string }> } // PERBAIKAN: params sebagai Promise
 ) {
     try {
         // Otentikasi dan Otorisasi Tutor
@@ -31,7 +31,8 @@ export async function PUT(
             return NextResponse.json({ success: false, message: 'Akses ditolak.' }, { status: 403 });
         }
 
-        const { sesiId, action } = params;
+        // PERBAIKAN: Tunggu params dengan await
+        const { sesiId, action } = await params;
 
         // Validasi aksi yang diperbolehkan
         if (action !== 'activate' && action !== 'deactivate') {

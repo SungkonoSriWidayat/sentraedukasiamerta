@@ -2,7 +2,7 @@
 import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import Class from '@/models/Class';
-import { headers } from 'next/headers'; // Import headers
+import { headers } from 'next/headers';// Import headers
 import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.NEXTAUTH_SECRET!;

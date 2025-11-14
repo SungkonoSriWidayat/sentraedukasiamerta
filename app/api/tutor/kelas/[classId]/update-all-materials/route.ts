@@ -13,7 +13,7 @@ interface DecodedToken extends JwtPayload {
 // Handler untuk PUT: Memperbarui semua materi dalam sebuah kelas
 export async function PUT(
     req: NextRequest,
-    { params }: { params: { classId: string } }
+    { params }: { params: Promise<{ classId: string }> } // PERBAIKAN: params sebagai Promise
 ) {
     const token = req.headers.get('Authorization')?.split(' ')[1];
     if (!token) {
@@ -26,7 +26,8 @@ export async function PUT(
             return NextResponse.json({ success: false, message: 'Akses tidak sah' }, { status: 403 });
         }
 
-        const { classId } = params;
+        // PERBAIKAN: Tunggu params dengan await
+        const { classId } = await params;
         const { materi } = await req.json();
 
         // Validasi data yang masuk
@@ -58,4 +59,3 @@ export async function PUT(
         return NextResponse.json({ success: false, message: 'Terjadi kesalahan pada server.' }, { status: 500 });
     }
 }
-

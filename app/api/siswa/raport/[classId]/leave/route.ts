@@ -17,7 +17,7 @@ interface DecodedToken extends JwtPayload {
 
 export async function DELETE(
     req: NextRequest,
-    { params }: { params: { classId: string } }
+    { params }: { params: Promise<{ classId: string }> } // PERBAIKAN: params sebagai Promise
 ) {
     const token = req.headers.get('Authorization')?.split(' ')[1];
     if (!token) {
@@ -27,7 +27,9 @@ export async function DELETE(
     try {
         const decoded = verify(token, secret!) as DecodedToken;
         const studentId = decoded.id; // Ambil ID siswa dari token
-        const { classId } = params;
+        
+        // PERBAIKAN: Tunggu params dengan await
+        const { classId } = await params;
 
         // Validasi ID
         if (!mongoose.Types.ObjectId.isValid(classId) || !mongoose.Types.ObjectId.isValid(studentId)) {
@@ -85,4 +87,3 @@ export async function DELETE(
          return NextResponse.json({ success: false, message: 'Terjadi kesalahan pada server saat memproses permintaan.' }, { status: 500 });
     }
 }
-

@@ -9,7 +9,10 @@ import mongoose from 'mongoose';
 
 const JWT_SECRET = process.env.NEXTAUTH_SECRET!;
 
-export async function GET(req: NextRequest, context: { params: { classId: string } }) {
+export async function GET(
+  req: NextRequest, 
+  context: { params: Promise<{ classId: string }> } // PERBAIKAN: params sebagai Promise
+) {
   try {
     const authHeader = req.headers.get('Authorization');
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -40,7 +43,8 @@ export async function GET(req: NextRequest, context: { params: { classId: string
     
     User.name;
 
-    const { classId } = context.params;
+    // PERBAIKAN: Tunggu params dengan await
+    const { classId } = await context.params;
 
     const kelas = await Kelas.findById(classId)
       .populate('enrolledStudents', 'namaLengkap')
@@ -92,4 +96,3 @@ export async function GET(req: NextRequest, context: { params: { classId: string
     return NextResponse.json({ success: false, message: 'Terjadi kesalahan pada server.' }, { status: 500 });
   }
 }
-

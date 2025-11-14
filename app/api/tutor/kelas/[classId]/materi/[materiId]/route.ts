@@ -14,7 +14,7 @@ interface DecodedToken extends JwtPayload {
 // Handler untuk PATCH: Memperbarui field spesifik pada satu materi
 export async function PATCH(
     req: NextRequest,
-    { params }: { params: { classId: string; materiId: string } }
+    { params }: { params: Promise<{ classId: string; materiId: string }> } // PERBAIKAN: params sebagai Promise
 ) {
     const token = req.headers.get('Authorization')?.split(' ')[1];
     if (!token) {
@@ -27,7 +27,8 @@ export async function PATCH(
             return NextResponse.json({ success: false, message: 'Akses tidak sah' }, { status: 403 });
         }
 
-        const { classId, materiId } = params;
+        // PERBAIKAN: Tunggu params dengan await
+        const { classId, materiId } = await params;
         const body = await req.json();
 
         // Validasi dasar: pastikan body tidak kosong

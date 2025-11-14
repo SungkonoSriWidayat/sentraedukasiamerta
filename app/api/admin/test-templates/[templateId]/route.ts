@@ -7,10 +7,15 @@ import jwt from 'jsonwebtoken';
 import mongoose from 'mongoose';
 
 // --- GET a single template by its ID ---
-export async function GET(request: Request, { params }: { params: { templateId: string } }) {
+export async function GET(
+  request: Request, 
+  { params }: { params: Promise<{ templateId: string }> } // PERBAIKAN: params sebagai Promise
+) {
     try {
         await connectDB();
-        const { templateId } = params;
+        
+        // PERBAIKAN: Tunggu params dengan await
+        const { templateId } = await params;
 
         if (!mongoose.Types.ObjectId.isValid(templateId)) {
             return NextResponse.json({ message: 'ID template tidak valid' }, { status: 400 });
@@ -29,11 +34,14 @@ export async function GET(request: Request, { params }: { params: { templateId: 
     }
 }
 
-
 // --- UPDATE a template by its ID ---
-export async function PUT(request: Request, { params }: { params: { templateId: string } }) {
+export async function PUT(
+  request: Request, 
+  { params }: { params: Promise<{ templateId: string }> } // PERBAIKAN: params sebagai Promise
+) {
     try {
-        const { templateId } = params;
+        // PERBAIKAN: Tunggu params dengan await
+        const { templateId } = await params;
         
         // --- Authentication (same as POST) ---
         const authHeader = request.headers.get('Authorization');

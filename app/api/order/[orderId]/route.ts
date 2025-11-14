@@ -33,7 +33,10 @@ interface IPopulatedOrder {
   // Tambahkan field lain dari model Order jika diperlukan
 }
 
-export async function GET(req: NextRequest, { params }: { params: { orderId: string } }) {
+export async function GET(
+  req: NextRequest, 
+  { params }: { params: Promise<{ orderId: string }> } // PERBAIKAN: params sebagai Promise
+) {
   try {
     const authHeader = req.headers.get('authorization');
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -54,7 +57,9 @@ export async function GET(req: NextRequest, { params }: { params: { orderId: str
     }
 
     await dbConnect();
-    const { orderId } = params;
+    
+    // PERBAIKAN: Tunggu params dengan await
+    const { orderId } = await params;
 
     if (!mongoose.Types.ObjectId.isValid(orderId)) {
       return NextResponse.json({ success: false, message: 'ID Order tidak valid' }, { status: 400 });

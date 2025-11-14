@@ -9,7 +9,7 @@ const secret = process.env.NEXTAUTH_SECRET; // <-- DITAMBAHKAN: Mengambil secret
 
 export async function DELETE(
     req: Request,
-    { params }: { params: { sesiId: string } }
+    { params }: { params: Promise<{ sesiId: string }> } // PERBAIKAN: params sebagai Promise
 ) {
     const token = req.headers.get('Authorization')?.split(' ')[1];
 
@@ -28,7 +28,9 @@ export async function DELETE(
         // ---------------------------------------------
 
         await dbConnect();
-        const { sesiId } = params;
+        
+        // PERBAIKAN: Tunggu params dengan await
+        const { sesiId } = await params;
 
         if (!sesiId) {
             return NextResponse.json({ success: false, message: 'ID Sesi diperlukan' }, { status: 400 });

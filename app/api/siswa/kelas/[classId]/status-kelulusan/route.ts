@@ -24,7 +24,7 @@ interface IGraduationStatus {
 
 export async function GET(
     req: NextRequest,
-    { params }: { params: { classId: string } }
+    { params }: { params: Promise<{ classId: string }> } // PERBAIKAN: params sebagai Promise
 ) {
     const token = req.headers.get('Authorization')?.split(' ')[1];
     if (!token) {
@@ -34,7 +34,9 @@ export async function GET(
     try {
         const decoded = verify(token, secret!) as DecodedToken;
         const studentId = decoded.id;
-        const { classId } = params;
+        
+        // PERBAIKAN: Tunggu params dengan await
+        const { classId } = await params;
 
         if (!mongoose.Types.ObjectId.isValid(classId)) {
             return NextResponse.json({ success: false, message: 'ID Kelas tidak valid.' }, { status: 400 });

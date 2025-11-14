@@ -8,7 +8,10 @@ const secret = process.env.NEXTAUTH_SECRET;
 // Tipe data untuk status yang valid
 const validStatuses = ["kelas belum siap", "kelas siap", "kelas terlalu banyak siswa"];
 
-export async function PUT(req: NextRequest, { params }: { params: { classId: string } }) {
+export async function PUT(
+  req: NextRequest, 
+  { params }: { params: Promise<{ classId: string }> } // PERBAIKAN: params sebagai Promise
+) {
   const authHeader = req.headers.get('Authorization');
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return NextResponse.json({ success: false, message: 'Token autentikasi tidak ditemukan.' }, { status: 401 });
@@ -24,7 +27,9 @@ export async function PUT(req: NextRequest, { params }: { params: { classId: str
 
     // 2. Ambil Data dari Body
     const { adminStatus } = await req.json();
-    const { classId } = params;
+    
+    // PERBAIKAN: Tunggu params dengan await
+    const { classId } = await params;
 
     // 3. Validasi Input
     if (!adminStatus || !validStatuses.includes(adminStatus)) {

@@ -6,7 +6,10 @@ import jwt, { JwtPayload } from 'jsonwebtoken';
 
 const secret = process.env.NEXTAUTH_SECRET;
 
-export async function GET(req: NextRequest, { params }: { params: { classId: string } }) {
+export async function GET(
+  req: NextRequest, 
+  { params }: { params: Promise<{ classId: string }> } // PERBAIKAN: params sebagai Promise
+) {
   const authHeader = req.headers.get('Authorization');
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return NextResponse.json({ success: false, message: 'Token tidak ditemukan.' }, { status: 401 });
@@ -20,7 +23,9 @@ export async function GET(req: NextRequest, { params }: { params: { classId: str
     }
 
     await dbConnect();
-    const { classId } = params;
+    
+    // PERBAIKAN: Tunggu params dengan await
+    const { classId } = await params;
 
     // --- PERBAIKAN: Menambahkan 'tutorId' ke dalam .select() ---
     const kelas = await Class.findById(classId)

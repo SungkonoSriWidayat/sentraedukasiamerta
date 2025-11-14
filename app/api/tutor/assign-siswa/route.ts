@@ -5,7 +5,10 @@ import { verify, JwtPayload } from 'jsonwebtoken'; // PERBAIKAN: Menggunakan jso
 
 const secret = process.env.NEXTAUTH_SECRET;
 
-export async function PUT(req: NextRequest, { params }: { params: { classId: string, sesiId: string } }) {
+export async function PUT(
+    req: NextRequest, 
+    { params }: { params: Promise<{ classId: string, sesiId: string }> } // PERBAIKAN: params sebagai Promise
+) {
     const token = req.headers.get('Authorization')?.split(' ')[1];
     if (!token) {
         return NextResponse.json({ success: false, message: 'Akses ditolak' }, { status: 401 });
@@ -20,7 +23,8 @@ export async function PUT(req: NextRequest, { params }: { params: { classId: str
 
         await dbConnect();
         
-        const { sesiId } = params;
+        // PERBAIKAN: Tunggu params dengan await
+        const { sesiId } = await params;
         const { siswaId } = await req.json();
 
         if (!siswaId) {
@@ -49,4 +53,3 @@ export async function PUT(req: NextRequest, { params }: { params: { classId: str
         return NextResponse.json({ success: false, message: 'Terjadi kesalahan pada server.' }, { status: 500 });
     }
 }
-

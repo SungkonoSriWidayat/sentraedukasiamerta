@@ -10,7 +10,7 @@ const secret = process.env.NEXTAUTH_SECRET;
 // PERBAIKAN: Cara menerima `params` diubah sesuai standar Next.js App Router
 export async function GET(
     req: NextRequest,
-    { params }: { params: { classId: string; pertemuanIndex: string } }
+    { params }: { params: Promise<{ classId: string; pertemuanIndex: string }> } // PERBAIKAN: params sebagai Promise
 ) {
     const token = req.headers.get('Authorization')?.split(' ')[1];
     if (!token) {
@@ -21,8 +21,8 @@ export async function GET(
         const decoded = verify(token, secret!) as JwtPayload;
         const studentId = decoded.id;
 
-        // PERBAIKAN: `classId` dan `pertemuanIndex` diambil dari `params`
-        const { classId, pertemuanIndex } = params;
+        // PERBAIKAN: `classId` dan `pertemuanIndex` diambil dari `params` dengan await
+        const { classId, pertemuanIndex } = await params;
         const index = parseInt(pertemuanIndex, 10);
 
         if (isNaN(index)) {

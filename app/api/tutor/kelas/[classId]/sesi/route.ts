@@ -12,7 +12,10 @@ interface DecodedToken extends JwtPayload {
 }
 
 // Handler untuk GET: Mengambil semua sesi untuk sebuah kelas
-export async function GET(req: NextRequest, context: { params: { classId: string } }) {
+export async function GET(
+  req: NextRequest, 
+  context: { params: Promise<{ classId: string }> } // PERBAIKAN: params sebagai Promise
+) {
     try {
         // Otentikasi dan Otorisasi
         const authHeader = req.headers.get('Authorization');
@@ -28,7 +31,8 @@ export async function GET(req: NextRequest, context: { params: { classId: string
             return NextResponse.json({ success: false, message: 'Akses ditolak.' }, { status: 403 });
         }
 
-        const { classId } = context.params;
+        // PERBAIKAN: Tunggu params dengan await
+        const { classId } = await context.params;
         await dbConnect();
 
         // Mengambil data dari model SesiKelas
@@ -42,7 +46,10 @@ export async function GET(req: NextRequest, context: { params: { classId: string
 }
 
 // Handler untuk POST: Membuat sesi baru
-export async function POST(req: NextRequest, context: { params: { classId: string } }) {
+export async function POST(
+  req: NextRequest, 
+  context: { params: Promise<{ classId: string }> } // PERBAIKAN: params sebagai Promise
+) {
   try {
     // Otentikasi dan Otorisasi
     const authHeader = req.headers.get('Authorization');
@@ -58,7 +65,8 @@ export async function POST(req: NextRequest, context: { params: { classId: strin
       return NextResponse.json({ success: false, message: 'Akses ditolak.' }, { status: 403 });
     }
 
-    const { classId } = context.params;
+    // PERBAIKAN: Tunggu params dengan await
+    const { classId } = await context.params;
     const { tanggalSesi, materiId, siswaId } = await req.json();
 
     if (!tanggalSesi || !materiId || !siswaId) {
@@ -85,4 +93,3 @@ export async function POST(req: NextRequest, context: { params: { classId: strin
     return NextResponse.json({ success: false, message: 'Terjadi kesalahan pada server.' }, { status: 500 });
   }
 }
-
