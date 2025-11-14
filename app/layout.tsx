@@ -6,6 +6,10 @@ import "./globals.css";
 import { AuthProvider } from "./context/AuthContext"; 
 // Hapus import NextAuthProvider jika Anda sudah tidak menggunakan NextAuth.js
 // import NextAuthProvider from './components/NextAuthProvider'; 
+// app/page.tsx
+export const dynamic = 'force-dynamic';
+
+// Kode halaman Anda yang sudah ada...
 
 const inter = Inter({ subsets: ["latin"] });
 

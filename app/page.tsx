@@ -5,6 +5,10 @@ import ClassGrid from './components/ClassGrid';
 import Footer from './components/Footer';
 import dbConnect from '@/lib/mongodb';
 import Class from '@/models/Class';
+// app/page.tsx
+export const dynamic = 'force-dynamic';
+
+// Kode halaman Anda yang sudah ada...
 
 async function getClasses() {
   await dbConnect();
